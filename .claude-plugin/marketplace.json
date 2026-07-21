@@ -1,0 +1,15 @@
+{
+  "name": "noslop",
+  "owner": {
+    "name": "Paldom",
+    "url": "https://github.com/Paldom"
+  },
+  "plugins": [
+    {
+      "name": "noslop",
+      "source": ".",
+      "description": "Agent Skills that strip AI writing tells from copy - em dashes, 'it's not X, it's Y' constructions, hedging, and bloat - so text reads like a human wrote it, with evals to verify.",
+      "category": "development"
+    }
+  ]
+}
