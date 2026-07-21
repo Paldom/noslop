@@ -1,0 +1,11 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "De-slop pipeline",
+      "description": "Measure, strip, and verify away AI writing tells - deterministic scores in, human-sounding copy out, with proof nothing important changed.",
+      "skills": ["slop-lint", "deslop", "deslop-verify"]
+    }
+  ]
+}

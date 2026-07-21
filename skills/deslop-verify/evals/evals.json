@@ -1,0 +1,69 @@
+{
+  "skill": "deslop-verify",
+  "cases": [
+    { "type": "should_trigger", "prompt": "did the rewrite change any facts or quotes?" },
+    { "type": "should_trigger", "prompt": "verify the edited draft against the original" },
+    { "type": "should_trigger", "prompt": "check that the de-slopped version kept all the numbers" },
+    { "type": "should_trigger", "prompt": "compare before and after versions - did anything important change in the edit?" },
+    { "type": "should_trigger", "prompt": "make sure the copy edit didn't touch the code blocks" },
+    { "type": "should_trigger", "prompt": "did the humanizer mess with my quotes? here's the original and the new version" },
+    { "type": "should_trigger", "prompt": "run verify on original.md vs edited.md" },
+    { "type": "should_trigger", "prompt": "how much did the editor actually change? feels over-edited" },
+    { "type": "should_trigger", "prompt": "check this rewrite for over-correction against my source text" },
+    { "type": "should_trigger", "prompt": "was anything lost between draft-v1.md and draft-v2.md?" },
+    { "type": "should_not_trigger", "prompt": "score this blog post for AI tells" },
+    { "type": "should_not_trigger", "prompt": "rewrite this so it reads human" },
+    { "type": "should_not_trigger", "prompt": "strip the slop from this draft" },
+    { "type": "should_not_trigger", "prompt": "lint the docs folder for AI patterns in CI" },
+    { "type": "should_not_trigger", "prompt": "diff these two JSON config files" },
+    { "type": "should_not_trigger", "prompt": "review this PR for bugs" },
+    { "type": "should_not_trigger", "prompt": "verify the build passes before merging" },
+    { "type": "should_not_trigger", "prompt": "check my essay for plagiarism" },
+    { "type": "should_not_trigger", "prompt": "proofread the edited draft for typos" },
+    { "type": "should_not_trigger", "prompt": "compare these two laptops and tell me which to buy" },
+    {
+      "type": "quality",
+      "prompt": "verify edited.md against original.md",
+      "expected_behavior": [
+        "runs scripts/verify_edit.py with the before and after files rather than eyeballing a diff",
+        "reports hard-invariant results (code, quotes, numbers, links) separately from warn-level checks and metrics",
+        "states that a pass means surface integrity, not proven meaning preservation",
+        "does not produce or propose a rewrite"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "check whether this edit is safe: the after version says 'about forty' where the original said '41'",
+      "expected_behavior": [
+        "the numbers invariant fails and the script exits non-zero",
+        "reports exactly which value disappeared and where",
+        "recommends restoring the exact figure instead of accepting the paraphrase"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "the editor barely touched my clean article - confirm it was a no-op",
+      "expected_behavior": [
+        "reports a near-zero token edit ratio and passing invariants",
+        "frames low edit ratio on clean text as the desired no-op behavior"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "did the deslop pass stay inside the spans the linter flagged? here's the lint JSON",
+      "expected_behavior": [
+        "passes the lint report via --lint-report to compute edit localization",
+        "reports the share of changed lines that fall within flagged lines and warns if edits strayed elsewhere"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "my human-written essay came back 40% rewritten from an AI-cleanup tool - how bad is it?",
+      "expected_behavior": [
+        "flags the high token edit ratio as over-correction",
+        "reports any sentence-rhythm flattening (variance collapse) between versions",
+        "advises reverting to the original rather than polishing the over-edited version"
+      ]
+    }
+  ]
+}

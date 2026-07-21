@@ -1,0 +1,70 @@
+{
+  "skill": "deslop",
+  "cases": [
+    { "type": "should_trigger", "prompt": "deslop this draft" },
+    { "type": "should_trigger", "prompt": "strip the AI tells from this post but keep my voice" },
+    { "type": "should_trigger", "prompt": "this reads machine-written - clean it up without changing the meaning" },
+    { "type": "should_trigger", "prompt": "remove the AI slop from my announcement copy" },
+    { "type": "should_trigger", "prompt": "de-AI this paragraph, keep all the facts" },
+    { "type": "should_trigger", "prompt": "can u make this blog post not sound like chatgpt wrote it" },
+    { "type": "should_trigger", "prompt": "kill the it's-not-X-it's-Y constructions and the hedging in this doc" },
+    { "type": "should_trigger", "prompt": "my draft is full of AI patterns - fix them and prove nothing important changed" },
+    { "type": "should_trigger", "prompt": "humanize this section but don't touch the quotes or numbers" },
+    { "type": "should_trigger", "prompt": "rewrite the intro so it reads human, not like a chatbot" },
+    { "type": "should_not_trigger", "prompt": "score this copy for AI tells" },
+    { "type": "should_not_trigger", "prompt": "how AI-sounding is this? just give me a number" },
+    { "type": "should_not_trigger", "prompt": "did the edit change any quotes or figures?" },
+    { "type": "should_not_trigger", "prompt": "verify edited.md against original.md" },
+    { "type": "should_not_trigger", "prompt": "write a blog post about our product launch" },
+    { "type": "should_not_trigger", "prompt": "translate this post into German" },
+    { "type": "should_not_trigger", "prompt": "fix the grammar and typos in my essay" },
+    { "type": "should_not_trigger", "prompt": "make this more formal for an executive audience" },
+    { "type": "should_not_trigger", "prompt": "shorten this article to 100 words" },
+    { "type": "should_not_trigger", "prompt": "was this cover letter written by AI?" },
+    {
+      "type": "quality",
+      "prompt": "deslop this launch announcement: [slop-heavy marketing copy with two statistics and a customer quote]",
+      "expected_behavior": [
+        "runs slop-lint first and edits only flagged spans plus their sentences; unflagged prose is copied verbatim",
+        "statistics and the customer quote survive byte-for-byte, confirmed by running deslop-verify",
+        "reports before and after lint scores plus the verify result",
+        "prefers deleting padding over swapping in synonyms"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "remove the AI slop from this essay [clean human-written text that lints below warn]",
+      "expected_behavior": [
+        "returns the text untouched because the lint score is below the warn band",
+        "explains the no-op gate instead of inventing edits to justify the request"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "make this read less AI-generated [text by a non-native speaker with dialect features and a few genuine tells]",
+      "expected_behavior": [
+        "edits only the lint-flagged tells; grammar, article use, prepositions, idiom, and dialect features are left as written",
+        "does not normalize the prose toward Standard American English",
+        "states the dialect/ESL guard when explaining the edits"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "deslop docs/release-notes.md [markdown with fenced code blocks and links]",
+      "expected_behavior": [
+        "code blocks and link targets are byte-identical after the edit",
+        "runs deslop-verify and reports its pass before presenting the result",
+        "restores the original if verify reports a hard-invariant failure"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "this whole page sounds like AI, rewrite every sentence from scratch",
+      "expected_behavior": [
+        "declines to rewrite wholesale; keeps edits bounded to flagged spans within the edit-ratio budget",
+        "stops after at most two passes even if the score has not reached clean",
+        "reports honestly what remains and why unbounded rewriting is refused (over-correction, voice flattening)"
+      ]
+    }
+  ]
+}

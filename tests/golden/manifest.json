@@ -1,0 +1,286 @@
+{
+  "schema": 1,
+  "authorship": "All fixtures are original, fabricated for this repo (no copyrighted or scraped text). Slop cases have deliberately injected tells; ground truth is the injected_families list. Controls are written human styles - never 'fake ESL/dialect'; maintainers may add their own pre-AI writing as extra controls (they do not count toward floors).",
+  "floors": {
+    "slop": 12,
+    "control": 8,
+    "edge": 6
+  },
+  "cases": [
+    {
+      "file": "cases/slop-01-launch.md",
+      "stratum": "slop",
+      "genre": "general",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance",
+        "burstiness"
+      ],
+      "notes": "quote + $29 + 90 seconds must survive"
+    },
+    {
+      "file": "cases/slop-02-saas-landing.md",
+      "stratum": "slop",
+      "genre": "general",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance",
+        "burstiness"
+      ],
+      "notes": "$49, 4200 companies"
+    },
+    {
+      "file": "cases/slop-03-readme.md",
+      "stratum": "slop",
+      "genre": "technical",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance",
+        "formatting"
+      ],
+      "notes": "pip command + FLUX_TTL + 40,000 ops/sec"
+    },
+    {
+      "file": "cases/slop-04-abstract.md",
+      "stratum": "slop",
+      "genre": "academic",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance"
+      ],
+      "notes": "n=1847, 23% must survive; academic hedges stay"
+    },
+    {
+      "file": "cases/slop-05-listicle.md",
+      "stratum": "slop",
+      "genre": "general",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance",
+        "burstiness",
+        "formatting"
+      ],
+      "notes": "34 minutes"
+    },
+    {
+      "file": "cases/slop-06-memo.md",
+      "stratum": "slop",
+      "genre": "general",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance",
+        "burstiness"
+      ],
+      "notes": "dates + 9-to-6 squads numbers"
+    },
+    {
+      "file": "cases/slop-07-travel.md",
+      "stratum": "slop",
+      "genre": "general",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance",
+        "burstiness"
+      ],
+      "notes": "8:30 ferry, 95 euros"
+    },
+    {
+      "file": "cases/slop-08-product-update.md",
+      "stratum": "slop",
+      "genre": "general",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance",
+        "burstiness"
+      ],
+      "notes": "480ms->95ms, 78%"
+    },
+    {
+      "file": "cases/slop-09-selfhelp.md",
+      "stratum": "slop",
+      "genre": "general",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance"
+      ],
+      "notes": "66 days, 40%"
+    },
+    {
+      "file": "cases/slop-10-pressrelease.md",
+      "stratum": "slop",
+      "genre": "general",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance",
+        "burstiness"
+      ],
+      "notes": "quote + 2.3M patients + 140 clinics"
+    },
+    {
+      "file": "cases/slop-11-newsletter.md",
+      "stratum": "slop",
+      "genre": "general",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance",
+        "burstiness"
+      ],
+      "notes": "3.4x, 18%, subscribe URL"
+    },
+    {
+      "file": "cases/slop-12-tutorial.md",
+      "stratum": "slop",
+      "genre": "technical",
+      "injected_families": [
+        "era_vocab",
+        "neg_parallel",
+        "tricolon",
+        "significance"
+      ],
+      "notes": "docker command + version"
+    },
+    {
+      "file": "cases/control-01-terse.md",
+      "stratum": "control",
+      "genre": "general",
+      "style": "terse incident write-up",
+      "notes": "must come back near-untouched"
+    },
+    {
+      "file": "cases/control-02-terse.md",
+      "stratum": "control",
+      "genre": "general",
+      "style": "terse hobby write-up",
+      "notes": "must come back near-untouched"
+    },
+    {
+      "file": "cases/control-03-dashes.md",
+      "stratum": "control",
+      "genre": "general",
+      "style": "dash-heavy essayist",
+      "notes": "must come back near-untouched"
+    },
+    {
+      "file": "cases/control-04-dashes.md",
+      "stratum": "control",
+      "genre": "general",
+      "style": "dash-heavy essayist",
+      "notes": "must come back near-untouched"
+    },
+    {
+      "file": "cases/control-05-academic.md",
+      "stratum": "control",
+      "genre": "academic",
+      "style": "formal academic, legitimately hedge-dense",
+      "notes": "must come back near-untouched"
+    },
+    {
+      "file": "cases/control-06-academic.md",
+      "stratum": "control",
+      "genre": "academic",
+      "style": "formal academic archival",
+      "notes": "must come back near-untouched"
+    },
+    {
+      "file": "cases/control-07-casual.md",
+      "stratum": "control",
+      "genre": "casual",
+      "style": "lowercase casual blog",
+      "notes": "must come back near-untouched"
+    },
+    {
+      "file": "cases/control-08-casual.md",
+      "stratum": "control",
+      "genre": "casual",
+      "style": "casual build log",
+      "notes": "must come back near-untouched"
+    },
+    {
+      "file": "cases/edge-01-codeheavy.md",
+      "stratum": "edge",
+      "genre": "technical",
+      "invariant_pressure": [
+        "fenced code x2",
+        "env vars",
+        "kubectl commands"
+      ],
+      "notes": "slop-flavored; scores descriptive, invariants hard"
+    },
+    {
+      "file": "cases/edge-02-quoteheavy.md",
+      "stratum": "edge",
+      "genre": "general",
+      "invariant_pressure": [
+        "three long quotes",
+        "names",
+        "years"
+      ],
+      "notes": "slop-flavored; scores descriptive, invariants hard"
+    },
+    {
+      "file": "cases/edge-03-numberdense.md",
+      "stratum": "edge",
+      "genre": "general",
+      "invariant_pressure": [
+        "18 financial figures",
+        "percentages",
+        "currency"
+      ],
+      "notes": "slop-flavored; scores descriptive, invariants hard"
+    },
+    {
+      "file": "cases/edge-04-linkdense.md",
+      "stratum": "edge",
+      "genre": "general",
+      "invariant_pressure": [
+        "five URLs",
+        "email address"
+      ],
+      "notes": "slop-flavored; scores descriptive, invariants hard"
+    },
+    {
+      "file": "cases/edge-05-identifiers.md",
+      "stratum": "edge",
+      "genre": "technical",
+      "invariant_pressure": [
+        "CamelCase + snake_case identifiers",
+        "env flags"
+      ],
+      "notes": "slop-flavored; scores descriptive, invariants hard"
+    },
+    {
+      "file": "cases/edge-06-mixed.md",
+      "stratum": "edge",
+      "genre": "general",
+      "invariant_pressure": [
+        "fenced code",
+        "quote",
+        "URL",
+        "benchmark numbers"
+      ],
+      "notes": "slop-flavored; scores descriptive, invariants hard"
+    }
+  ]
+}

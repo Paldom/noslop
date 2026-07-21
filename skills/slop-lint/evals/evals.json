@@ -1,0 +1,71 @@
+{
+  "skill": "slop-lint",
+  "cases": [
+    { "type": "should_trigger", "prompt": "score this blog post for AI tells" },
+    { "type": "should_trigger", "prompt": "run a slop lint on docs/announcement.md" },
+    { "type": "should_trigger", "prompt": "how AI-sounding is this paragraph? give me a number" },
+    { "type": "should_trigger", "prompt": "check this copy for slop before I publish it" },
+    { "type": "should_trigger", "prompt": "can u scan this readme for ai writing patterns" },
+    { "type": "should_trigger", "prompt": "lint the marketing copy for AI-sounding patterns" },
+    { "type": "should_trigger", "prompt": "add a gate to CI so AI-slop-heavy docs fail the build" },
+    { "type": "should_trigger", "prompt": "give me an AI slop score for this draft" },
+    { "type": "should_trigger", "prompt": "flag the AI-ish patterns in this section with line numbers" },
+    { "type": "should_trigger", "prompt": "measure the em dash rate and hedging density in this piece" },
+    { "type": "should_not_trigger", "prompt": "rewrite this so it doesn't sound like AI" },
+    { "type": "should_not_trigger", "prompt": "strip the em dashes and hedging from this post" },
+    { "type": "should_not_trigger", "prompt": "make this copy read more human" },
+    { "type": "should_not_trigger", "prompt": "did the rewrite change any facts or quotes?" },
+    { "type": "should_not_trigger", "prompt": "verify the edited draft kept all the numbers intact" },
+    { "type": "should_not_trigger", "prompt": "was this essay written by AI or by my student?" },
+    { "type": "should_not_trigger", "prompt": "run eslint on the frontend and fix the errors" },
+    { "type": "should_not_trigger", "prompt": "check this post for grammar and spelling mistakes" },
+    { "type": "should_not_trigger", "prompt": "score this resume against the job description" },
+    { "type": "should_not_trigger", "prompt": "add a spell-check step to our CI pipeline" },
+    {
+      "type": "quality",
+      "prompt": "Score README.md for AI tells",
+      "expected_behavior": [
+        "runs scripts/slop_lint.py on the file rather than judging by feel",
+        "reports the 0-100 score, the band, and the per-metric breakdown with flagged line numbers",
+        "explains that flags come from clusters of co-occurring tells, not any single metric",
+        "does not rewrite or edit the text"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "score this academic abstract for slop: [a 200-word abstract with hedges]",
+      "expected_behavior": [
+        "passes --genre academic so hedge and em-dash thresholds are relaxed",
+        "states which genre profile was used in the report",
+        "does not flag ordinary academic hedging as slop on its own"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "give me a slop score for this tweet: 'Big news — we shipped.'",
+      "expected_behavior": [
+        "notes the text is below the minimum length for a confident score",
+        "reports the low-confidence flag from the script instead of inventing a confident number",
+        "does not fail or warn on the em dash alone"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "wire a slop gate into our docs CI",
+      "expected_behavior": [
+        "uses the script's --fail-above flag and documents the exit-code contract (0 pass, 1 error, 2 threshold exceeded)",
+        "recommends a warn-first rollout with the documented default threshold rather than inventing a strict cutoff",
+        "mentions thresholds are genre-aware and configurable"
+      ]
+    },
+    {
+      "type": "quality",
+      "prompt": "scan this human-written essay that uses lots of em dashes for AI patterns",
+      "expected_behavior": [
+        "reports the em-dash rate but does not conclude AI involvement from dashes alone",
+        "states the cluster rule and the wide human em-dash range explicitly",
+        "never frames the result as proof of authorship or an accusation"
+      ]
+    }
+  ]
+}
