@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.svg" alt="noslop icon" width="128"/>
+</p>
+
 # Noslop
 
 [![CI](https://github.com/Paldom/noslop/actions/workflows/ci.yml/badge.svg)](https://github.com/Paldom/noslop/actions/workflows/ci.yml)
