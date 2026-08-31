@@ -57,8 +57,20 @@ IDENTIFIER = re.compile(
 )
 CAP_RUN = re.compile(r"(?<![.!?]\s)(?<!^)\b(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b")
 NEGATION = {"not", "no", "never", "n't", "cannot", "without", "none", "nor"}
-MODALITY = {"may", "might", "must", "always", "all", "only", "suggests",
-            "suggest", "proves", "prove", "guarantees", "guarantee"}
+MODALITY = {
+    "may",
+    "might",
+    "must",
+    "always",
+    "all",
+    "only",
+    "suggests",
+    "suggest",
+    "proves",
+    "prove",
+    "guarantees",
+    "guarantee",
+}
 SENT_SPLIT = re.compile(r"(?<=[.!?])[\"'”’)\]]*\s+")
 
 
@@ -117,7 +129,7 @@ def fenced_blocks(text):
             run = m.group(1)
             if current is None:
                 current, fence = [ln], (run[0], len(run))
-            elif run[0] == fence[0] and len(run) >= fence[1] and not ln[len(run):].strip():
+            elif run[0] == fence[0] and len(run) >= fence[1] and not ln[len(run) :].strip():
                 current.append(ln)
                 blocks.append("\n".join(current))
                 current, fence = None, None
@@ -146,10 +158,12 @@ def extract_all(text):
     return {
         "code_fenced": multiset(fenced),
         "code_inline": multiset(inline),
-        "quotes": multiset(norm_quote(q) for q in QUOTE.findall(prose_no_code)
-                           if len(q.split()) >= 5),
-        "numbers": multiset(n.replace(",", "").replace(" ", "")
-                            for n in NUMBER.findall(prose_no_code)),
+        "quotes": multiset(
+            norm_quote(q) for q in QUOTE.findall(prose_no_code) if len(q.split()) >= 5
+        ),
+        "numbers": multiset(
+            n.replace(",", "").replace(" ", "") for n in NUMBER.findall(prose_no_code)
+        ),
         "urls": multiset(clean_url(u) for u in URL.findall(prose)),
         "links": multiset(LINK_TARGET.findall(prose)),
         "identifiers": multiset(IDENTIFIER.findall(prose_no_code)),
@@ -179,15 +193,21 @@ def negation_check(before_text, after_text):
             cb = sum(1 for w in wb if w in vocab)
             ca = sum(1 for w in wa if w in vocab)
             if cb != ca:
-                flags.append({"kind": label,
-                              "before": (btxt or "<nothing>")[:120],
-                              "after": (atxt or "<nothing>")[:120]})
+                flags.append(
+                    {
+                        "kind": label,
+                        "before": (btxt or "<nothing>")[:120],
+                        "after": (atxt or "<nothing>")[:120],
+                    }
+                )
     return flags
 
 
 def changed_lines(before_text, after_text):
     n_before = len(before_text.splitlines())
-    sm = difflib.SequenceMatcher(a=before_text.splitlines(), b=after_text.splitlines(), autojunk=False)
+    sm = difflib.SequenceMatcher(
+        a=before_text.splitlines(), b=after_text.splitlines(), autojunk=False
+    )
     lines = set()
     for tag, i1, i2, _, _ in sm.get_opcodes():
         if tag == "equal":
@@ -215,10 +235,15 @@ def verify(before_text, after_text, lint_report=None):
     b, a = extract_all(before_text), extract_all(after_text)
     hard, warn = {}, {}
 
-    for key, mode in (("code_fenced", "equal"), ("code_inline", "equal"),
-                      ("quotes", "subset"), ("numbers", "equal"),
-                      ("urls", "equal"), ("links", "equal"),
-                      ("identifiers", "set_subset")):
+    for key, mode in (
+        ("code_fenced", "equal"),
+        ("code_inline", "equal"),
+        ("quotes", "subset"),
+        ("numbers", "equal"),
+        ("urls", "equal"),
+        ("links", "equal"),
+        ("identifiers", "set_subset"),
+    ):
         if mode == "set_subset":
             # distinct values must survive; repeated mentions may collapse
             # (deleting a slop sentence that repeats a product name is fine)
@@ -226,17 +251,27 @@ def verify(before_text, after_text, lint_report=None):
         else:
             missing, added = diff_counter(b[key], a[key])
         ok = not missing if mode in ("subset", "set_subset") else (not missing and not added)
-        hard[key] = {"pass": ok, "missing": missing[:10], "added": added[:10] if mode == "equal" else []}
+        hard[key] = {
+            "pass": ok,
+            "missing": missing[:10],
+            "added": added[:10] if mode == "equal" else [],
+        }
 
     ent_missing, ent_added = diff_counter(b["entities"], a["entities"])
-    warn["entities"] = {"ok": not ent_missing and not ent_added,
-                        "missing": ent_missing[:10], "added": ent_added[:10],
-                        "note": "capitalized-run proxy, not real NER"}
+    warn["entities"] = {
+        "ok": not ent_missing and not ent_added,
+        "missing": ent_missing[:10],
+        "added": ent_added[:10],
+        "note": "capitalized-run proxy, not real NER",
+    }
 
     big = max(len(before_text), len(after_text)) > BIG_INPUT_CHARS
     if big:
-        warn["negation"] = {"ok": True, "flags": [],
-                            "note": "skipped: input over %d chars" % BIG_INPUT_CHARS}
+        warn["negation"] = {
+            "ok": True,
+            "flags": [],
+            "note": f"skipped: input over {BIG_INPUT_CHARS} chars",
+        }
     else:
         neg = negation_check(b["_prose"], a["_prose"])
         warn["negation"] = {"ok": not neg, "flags": neg[:10]}
@@ -246,9 +281,13 @@ def verify(before_text, after_text, lint_report=None):
     warn["length"] = {"ok": 0.75 <= ratio <= 1.25, "after_over_before": round(ratio, 3)}
 
     if big:  # line-level ratio: cheaper than word-level on huge inputs
-        sm = difflib.SequenceMatcher(a=before_text.splitlines(), b=after_text.splitlines(), autojunk=False)
+        sm = difflib.SequenceMatcher(
+            a=before_text.splitlines(), b=after_text.splitlines(), autojunk=False
+        )
     else:
-        sm = difflib.SequenceMatcher(a=words_of(before_text.lower()), b=words_of(after_text.lower()), autojunk=False)
+        sm = difflib.SequenceMatcher(
+            a=words_of(before_text.lower()), b=words_of(after_text.lower()), autojunk=False
+        )
     edit_ratio = round(1 - sm.ratio(), 4)
     warn["edit_ratio"] = {"ok": edit_ratio <= 0.30, "value": edit_ratio}
 
@@ -257,24 +296,39 @@ def verify(before_text, after_text, lint_report=None):
     if cvb and cva and cvb > 0:
         collapse = round((cvb - cva) / cvb, 3)
         rhythm_ok = collapse <= 0.25
-    warn["rhythm"] = {"ok": rhythm_ok, "cv_before": cvb and round(cvb, 3),
-                      "cv_after": cva and round(cva, 3), "collapse": collapse}
+    warn["rhythm"] = {
+        "ok": rhythm_ok,
+        "cv_before": cvb and round(cvb, 3),
+        "cv_after": cva and round(cva, 3),
+        "collapse": collapse,
+    }
 
     if lint_report is not None:
         flagged = lint_flagged_lines(lint_report)
         changed = changed_lines(before_text, after_text)
         near = {ln for f in flagged for ln in (f - 1, f, f + 1)}
         localized = (sum(1 for ln in changed if ln in near) / len(changed)) if changed else 1.0
-        warn["localization"] = {"ok": localized >= 0.80, "value": round(localized, 3),
-                                "changed_lines": len(changed), "flagged_lines": len(flagged)}
+        warn["localization"] = {
+            "ok": localized >= 0.80,
+            "value": round(localized, 3),
+            "changed_lines": len(changed),
+            "flagged_lines": len(flagged),
+        }
 
     hard_pass = all(v["pass"] for v in hard.values())
     warn_ok = all(v["ok"] for v in warn.values())
     return {
-        "schema": SCHEMA, "pass": hard_pass, "warnings_clean": warn_ok,
-        "hard": hard, "warn": warn,
-        "metrics": {"edit_ratio": edit_ratio, "length_ratio": round(ratio, 3),
-                    "words_before": wb, "words_after": wa},
+        "schema": SCHEMA,
+        "pass": hard_pass,
+        "warnings_clean": warn_ok,
+        "hard": hard,
+        "warn": warn,
+        "metrics": {
+            "edit_ratio": edit_ratio,
+            "length_ratio": round(ratio, 3),
+            "words_before": wb,
+            "words_after": wa,
+        },
         "notes": [
             "PASS means surface integrity (protected content survived) - it never proves meaning was preserved.",
             "On clean human text expect edit_ratio near 0; a big ratio on low-slop text is over-correction.",
@@ -283,23 +337,38 @@ def verify(before_text, after_text, lint_report=None):
 
 
 def human_report(res):
-    out = ["verify: %s (warnings %s)" % ("PASS" if res["pass"] else "FAIL",
-                                         "clean" if res["warnings_clean"] else "raised")]
+    out = [
+        "verify: {} (warnings {})".format(
+            "PASS" if res["pass"] else "FAIL", "clean" if res["warnings_clean"] else "raised"
+        )
+    ]
     for name, v in res["hard"].items():
-        line = "  hard %-12s %s" % (name, "ok" if v["pass"] else "FAIL")
+        line = f"  hard {name:<12} {'ok' if v['pass'] else 'FAIL'}"
         if v["missing"]:
-            line += "  missing=%s" % v["missing"][:3]
+            line += "  missing={}".format(v["missing"][:3])
         if v.get("added"):
-            line += "  added=%s" % v["added"][:3]
+            line += "  added={}".format(v["added"][:3])
         out.append(line)
     for name, v in res["warn"].items():
-        detail = {k: w for k, w in v.items() if k not in ("ok", "flags", "missing", "added", "note")}
-        out.append("  warn %-12s %s  %s" % (name, "ok" if v["ok"] else "RAISED", detail or ""))
+        detail = {
+            k: w for k, w in v.items() if k not in ("ok", "flags", "missing", "added", "note")
+        }
+        out.append(f"  warn {name:<12} {'ok' if v['ok'] else 'RAISED'}  {detail or ''}")
         for f in v.get("flags", [])[:3]:
-            out.append("       %s: '%s' -> '%s'" % (f["kind"], f["before"][:60], f["after"][:60]))
+            out.append(
+                "       {}: '{}' -> '{}'".format(f["kind"], f["before"][:60], f["after"][:60])
+            )
         if v.get("missing") or v.get("added"):
-            out.append("       missing=%s added=%s" % (v.get("missing", [])[:3], v.get("added", [])[:3]))
-    out.append("  edit_ratio=%.3f length_ratio=%.3f" % (res["metrics"]["edit_ratio"], res["metrics"]["length_ratio"]))
+            out.append(
+                "       missing={} added={}".format(
+                    v.get("missing", [])[:3], v.get("added", [])[:3]
+                )
+            )
+    out.append(
+        "  edit_ratio={:.3f} length_ratio={:.3f}".format(
+            res["metrics"]["edit_ratio"], res["metrics"]["length_ratio"]
+        )
+    )
     out.extend("  note: " + n for n in res["notes"])
     return "\n".join(out)
 
@@ -336,8 +405,7 @@ def selftest():
     good = verify(FIX_BEFORE, FIX_GOOD)
     bad = verify(FIX_BEFORE, FIX_BAD)
     noop = verify(FIX_BEFORE, FIX_BEFORE)
-    neg_del = verify("The cache never crashed after that.\n\nWe kept the fix.",
-                     "We kept the fix.")
+    neg_del = verify("The cache never crashed after that.\n\nWe kept the fix.", "We kept the fix.")
     signed = verify("Margin moved by -4.2% in Q3.", "Margin moved by 4.2% in Q3.")
     unclosed = verify("intro\n\n```py\nsecret_code()\n", "intro\n")
     trailing = verify("See https://example.com/a.", "See https://example.com/a,")
@@ -345,16 +413,24 @@ def selftest():
         ("good edit passes hard invariants", good["pass"]),
         ("no-op passes with edit_ratio 0", noop["pass"] and noop["metrics"]["edit_ratio"] == 0),
         ("bad edit fails hard invariants", not bad["pass"]),
-        ("bad edit loses the 41% figure", any("41" in m for m in bad["hard"]["numbers"]["missing"])),
+        (
+            "bad edit loses the 41% figure",
+            any("41" in m for m in bad["hard"]["numbers"]["missing"]),
+        ),
         ("bad edit loses the quote", not bad["hard"]["quotes"]["pass"]),
         ("bad edit loses the URL", not bad["hard"]["urls"]["pass"]),
         ("bad edit loses code", not bad["hard"]["code_inline"]["pass"]),
-        ("negation flip caught on good-vs-bad", bool(verify(FIX_GOOD, FIX_BAD)["warn"]["negation"]["flags"])),
+        (
+            "negation flip caught on good-vs-bad",
+            bool(verify(FIX_GOOD, FIX_BAD)["warn"]["negation"]["flags"]),
+        ),
         ("deleted never-sentence is flagged", bool(neg_del["warn"]["negation"]["flags"])),
         ("sign flip on -4.2% fails numbers", not signed["hard"]["numbers"]["pass"]),
         ("unclosed fence still protects code", not unclosed["hard"]["code_fenced"]["pass"]),
-        ("nested fence is one block",
-         len(fenced_blocks("````text\na\n```sh\nb\n```\nc\n````\n")[0]) == 1),
+        (
+            "nested fence is one block",
+            len(fenced_blocks("````text\na\n```sh\nb\n```\nc\n````\n")[0]) == 1,
+        ),
         ("trailing URL punctuation is ignored", trailing["hard"]["urls"]["pass"]),
     ]
     failed = [n for n, ok in checks if not ok]
@@ -364,7 +440,9 @@ def selftest():
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Deterministic before/after edit verification. Never proves meaning; asserts surface integrity.")
+    ap = argparse.ArgumentParser(
+        description="Deterministic before/after edit verification. Never proves meaning; asserts surface integrity."
+    )
     ap.add_argument("before", nargs="?", help="original file")
     ap.add_argument("after", nargs="?", help="edited file")
     ap.add_argument("--lint-report", help="slop-lint --json output for edit-localization check")
@@ -382,10 +460,10 @@ def main(argv=None):
         before = Path(args.before).read_text(encoding="utf-8")
         after = Path(args.after).read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
-        print("ERROR: %s" % exc, file=sys.stderr)
+        print(f"ERROR: {exc}", file=sys.stderr)
         return 1
     if args.lint_report and not Path(args.lint_report).is_file():
-        print("ERROR: lint report not found: %s" % args.lint_report, file=sys.stderr)
+        print(f"ERROR: lint report not found: {args.lint_report}", file=sys.stderr)
         return 1
 
     res = verify(before, after, lint_report=args.lint_report)

@@ -1,6 +1,6 @@
 ---
 name: slop-lint
-description: Scores copy 0-100 for clusters of AI-writing tells with a deterministic script - genre-aware soft thresholds, span-anchored findings, CI gating via exit codes. Use when the user asks to scan, score, lint, check, or gate text for AI slop or AI-sounding patterns. Detect-only - not for rewriting text, verifying an edit, authorship accusations, or code linting.
+description: Scores copy 0-100 for AI-writing tells with a deterministic script - measures em dash rate, hedge-stack density and other cluster rates against genre-aware thresholds, with span-anchored findings and CI gating via exit codes. Use to scan, score, lint, measure or gate text for AI-sounding patterns. Detect-only - not for rewriting, verifying an edit, or code linting.
 ---
 
 # slop-lint

@@ -45,7 +45,7 @@ VERIFY = ROOT / "skills" / "deslop-verify" / "scripts" / "verify_edit.py"
 def run_json(cmd):
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if not proc.stdout.strip():
-        raise RuntimeError("no output from %s (stderr: %s)" % (cmd, proc.stderr[:200]))
+        raise RuntimeError(f"no output from {cmd} (stderr: {proc.stderr[:200]})")
     return json.loads(proc.stdout), proc.returncode
 
 
@@ -65,32 +65,48 @@ def check_corpus():
     for case in man["cases"]:
         path = GOLDEN / case["file"]
         if not path.is_file():
-            problems.append("missing file: %s" % case["file"])
+            problems.append("missing file: {}".format(case["file"]))
             continue
         counts[case["stratum"]] += 1
         res = lint(path, case["genre"])
         if res["confidence"] != "ok":
-            problems.append("%s: low-confidence lint (%d words)" % (case["file"], res["words"]))
+            problems.append(f"{case['file']}: low-confidence lint ({res['words']} words)")
         if case["stratum"] in ("slop", "edge") and res["score"] < 25:
-            problems.append("%s: %s case lints clean (%d) — fixture no longer flags" % (case["file"], case["stratum"], res["score"]))
+            problems.append(
+                f"{case['file']}: {case['stratum']} case lints clean "
+                f"({res['score']}) — fixture no longer flags"
+            )
         if case["stratum"] == "control" and res["score"] >= 25:
-            problems.append("%s: control lints %s (%d) — must be clean" % (case["file"], res["band"], res["score"]))
+            problems.append(
+                f"{case['file']}: control lints {res['band']} ({res['score']}) — must be clean"
+            )
     for stratum, floor in man["floors"].items():
         if counts[stratum] < floor:
-            problems.append("floor not met: %s has %d cases, need >= %d" % (stratum, counts[stratum], floor))
+            problems.append(
+                f"floor not met: {stratum} has {counts[stratum]} cases, need >= {floor}"
+            )
     if problems:
         print("CORPUS UNHEALTHY:")
         for p in problems:
             print("  - " + p)
         return 1
-    print("corpus healthy: %(slop)d slop, %(control)d control, %(edge)d edge cases; floors met" % counts)
+    print(
+        f"corpus healthy: {counts['slop']} slop, {counts['control']} control, "
+        f"{counts['edge']} edge cases; floors met"
+    )
     return 0
 
 
 def git_sha():
     try:
-        return subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"],
-                              capture_output=True, text=True).stdout.strip() or None
+        return (
+            subprocess.run(
+                ["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"],
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            or None
+        )
     except OSError:
         return None
 
@@ -117,17 +133,33 @@ def score_run(outputs, model, note):
         after = lint(out, case["genre"])
         lint_json = outputs / (Path(case["file"]).stem + ".lint.json")
         lint_json.write_text(json.dumps(before), encoding="utf-8")
-        vres, vcode = run_json([sys.executable, str(VERIFY), str(src), str(out),
-                                "--lint-report", str(lint_json), "--json"])
+        vres, _vcode = run_json(
+            [
+                sys.executable,
+                str(VERIFY),
+                str(src),
+                str(out),
+                "--lint-report",
+                str(lint_json),
+                "--json",
+            ]
+        )
         edited = vres["metrics"]["edit_ratio"] > 0
-        per_case.append({
-            "case": case["file"], "stratum": case["stratum"], "status": "ok",
-            "score_before": before["score"], "score_after": after["score"],
-            "drop": before["score"] - after["score"],
-            "invariants_pass": vres["pass"],
-            "edit_ratio": vres["metrics"]["edit_ratio"],
-            "localization": vres["warn"].get("localization", {}).get("value") if edited else None,
-        })
+        per_case.append(
+            {
+                "case": case["file"],
+                "stratum": case["stratum"],
+                "status": "ok",
+                "score_before": before["score"],
+                "score_after": after["score"],
+                "drop": before["score"] - after["score"],
+                "invariants_pass": vres["pass"],
+                "edit_ratio": vres["metrics"]["edit_ratio"],
+                "localization": vres["warn"].get("localization", {}).get("value")
+                if edited
+                else None,
+            }
+        )
     scored = [c for c in per_case if c["status"] == "ok"]
     slop = [c for c in scored if c["stratum"] == "slop"]
     controls = [c for c in scored if c["stratum"] == "control"]
@@ -148,17 +180,24 @@ def score_run(outputs, model, note):
     result = {
         "schema": 1,
         "date": datetime.date.today().isoformat(),
-        "model": model, "note": note,
-        "git_sha": git_sha(), "skill_hash": skill_hash(),
-        "aggregate": "INVALID (floors/missing outputs)" if invalid
-                     else ("PASS" if all(gates.values()) else "FAIL"),
-        "gates": gates, "missing_outputs": missing,
-        "controls_touched": bad_controls, "per_case": per_case,
+        "model": model,
+        "note": note,
+        "git_sha": git_sha(),
+        "skill_hash": skill_hash(),
+        "aggregate": "INVALID (floors/missing outputs)"
+        if invalid
+        else ("PASS" if all(gates.values()) else "FAIL"),
+        "gates": gates,
+        "missing_outputs": missing,
+        "controls_touched": bad_controls,
+        "per_case": per_case,
     }
-    out_file = outputs.parent / ("golden-results-%s-%s.json" % (result["date"], (model or "unknown").replace("/", "_")))
+    out_file = outputs.parent / (
+        "golden-results-{}-{}.json".format(result["date"], (model or "unknown").replace("/", "_"))
+    )
     out_file.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({k: v for k, v in result.items() if k != "per_case"}, indent=2))
-    print("full results: %s" % out_file)
+    print(f"full results: {out_file}")
     if invalid:
         return 3
     return 0 if result["aggregate"] == "PASS" else 2
@@ -175,10 +214,13 @@ def main(argv=None):
         return check_corpus()
     if args.outputs:
         if not args.model:
-            print("ERROR: --model is required with --outputs (results are not comparable without it)", file=sys.stderr)
+            print(
+                "ERROR: --model is required with --outputs (results are not comparable without it)",
+                file=sys.stderr,
+            )
             return 1
         if not Path(args.outputs).is_dir():
-            print("ERROR: outputs dir not found: %s" % args.outputs, file=sys.stderr)
+            print(f"ERROR: outputs dir not found: {args.outputs}", file=sys.stderr)
             return 1
         return score_run(args.outputs, args.model, args.note)
     ap.print_help()

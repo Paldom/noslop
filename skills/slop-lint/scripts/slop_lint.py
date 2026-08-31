@@ -35,19 +35,47 @@ MIN_SENTENCES = 8
 # membership churns; see references/thresholds.md for recalibration guidance.
 ERA_VOCAB = {
     # GPT-4 era (2023 - mid-2024): weight 1.0 — mostly decayed in frontier chat
-    "delve": 1.0, "delves": 1.0, "delving": 1.0, "delved": 1.0,
-    "tapestry": 1.0, "testament": 1.0, "intricate": 1.0, "intricacies": 1.0,
-    "pivotal": 1.0, "meticulous": 1.0, "meticulously": 1.0,
-    "commendable": 1.0, "multifaceted": 1.0, "realm": 1.0, "embark": 1.0,
-    "paramount": 1.0, "garner": 1.0, "bolster": 1.0, "vibrant": 1.0,
+    "delve": 1.0,
+    "delves": 1.0,
+    "delving": 1.0,
+    "delved": 1.0,
+    "tapestry": 1.0,
+    "testament": 1.0,
+    "intricate": 1.0,
+    "intricacies": 1.0,
+    "pivotal": 1.0,
+    "meticulous": 1.0,
+    "meticulously": 1.0,
+    "commendable": 1.0,
+    "multifaceted": 1.0,
+    "realm": 1.0,
+    "embark": 1.0,
+    "paramount": 1.0,
+    "garner": 1.0,
+    "bolster": 1.0,
+    "vibrant": 1.0,
     # GPT-4o era (mid-2024 - mid-2025): weight 1.5
-    "nestled": 1.5, "bustling": 1.5, "boasts": 1.5, "boasting": 1.5,
-    "underscore": 1.5, "underscores": 1.5, "underscoring": 1.5,
-    "fostering": 1.5, "leverage": 1.5, "leveraging": 1.5, "crucial": 1.5,
-    "seamless": 1.5, "seamlessly": 1.5, "groundbreaking": 1.5,
+    "nestled": 1.5,
+    "bustling": 1.5,
+    "boasts": 1.5,
+    "boasting": 1.5,
+    "underscore": 1.5,
+    "underscores": 1.5,
+    "underscoring": 1.5,
+    "fostering": 1.5,
+    "leverage": 1.5,
+    "leveraging": 1.5,
+    "crucial": 1.5,
+    "seamless": 1.5,
+    "seamlessly": 1.5,
+    "groundbreaking": 1.5,
     # GPT-5 era (mid-2025 on): weight 2.0 — the current, shrinking core
-    "emphasizing": 2.0, "enhance": 2.0, "enhancing": 2.0,
-    "highlighting": 2.0, "showcasing": 2.0, "showcases": 2.0,
+    "emphasizing": 2.0,
+    "enhance": 2.0,
+    "enhancing": 2.0,
+    "highlighting": 2.0,
+    "showcasing": 2.0,
+    "showcases": 2.0,
 }
 
 SIGNIFICANCE_PHRASES = [
@@ -83,9 +111,18 @@ ING_PIVOT = re.compile(
 )
 
 NEG_PARALLEL = [
-    re.compile(r"\bnot (?:just|only|merely|simply)\b[^.!?\n]{0,70}?\b(?:but|it(?:'|’)s|it is)\b", re.IGNORECASE),
-    re.compile(r"\b(?:it(?:'|’)s|it is|this is|that(?:'|’)s) not (?:about |just |only |merely )?[^.!?\n]{0,50}[,;—-]\s*(?:it(?:'|’)s|it is|but)\b", re.IGNORECASE),
-    re.compile(r"\bisn(?:'|’)t (?:just|about|merely|only)\b[^.!?\n]{0,70}?\b(?:it(?:'|’)s|but)\b", re.IGNORECASE),
+    re.compile(
+        r"\bnot (?:just|only|merely|simply)\b[^.!?\n]{0,70}?\b(?:but|it(?:'|’)s|it is)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:it(?:'|’)s|it is|this is|that(?:'|’)s) not (?:about |just |only |merely )?[^.!?\n]{0,50}[,;—-]\s*(?:it(?:'|’)s|it is|but)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\bisn(?:'|’)t (?:just|about|merely|only)\b[^.!?\n]{0,70}?\b(?:it(?:'|’)s|but)\b",
+        re.IGNORECASE,
+    ),
     re.compile(r"\bno \w+\.\s*no \w+\.\s*just\b", re.IGNORECASE),
     re.compile(r"\bnot because\b[^.!?\n]{0,60}?\bbut because\b", re.IGNORECASE),
 ]
@@ -128,28 +165,73 @@ SENT_SPLIT = re.compile(r"(?<=[.!?])[\"'”’)\]]*\s+")
 # derivation and recalibration protocol in references/thresholds.md.
 # For burstiness_cv and mtld LOW values are the tell (inverted comparison).
 THRESHOLDS = {
-    "general":   {"em_dash": (5, 9),  "era_vocab": (1.5, 3.0), "neg_parallel": (0.6, 1.5),
-                  "tricolon": (1.5, 3.0), "burstiness_cv": (0.45, 0.30), "bullet_share": (0.15, 0.30),
-                  "bold_per_1k": (4, 10), "significance": (0.5, 1.5), "mtld": (55, 45),
-                  "list3_share": (0.6, 0.8), "hedge_stack": (0.5, 1.5)},
-    "academic":  {"em_dash": (6, 11), "era_vocab": (1.5, 3.5), "neg_parallel": (0.5, 1.2),
-                  "tricolon": (1.2, 2.5), "burstiness_cv": (0.40, 0.28), "bullet_share": (0.05, 0.15),
-                  "bold_per_1k": (2, 6),  "significance": (0.8, 2.0), "mtld": (55, 45),
-                  "list3_share": (0.6, 0.8), "hedge_stack": (0.8, 2.0)},
-    "technical": {"em_dash": (3, 6),  "era_vocab": (1.2, 2.5), "neg_parallel": (0.6, 1.5),
-                  "tricolon": (1.0, 2.0), "burstiness_cv": (0.42, 0.30), "bullet_share": (0.45, 0.70),
-                  "bold_per_1k": (6, 15), "significance": (0.4, 1.2), "mtld": (50, 40),
-                  "list3_share": (0.65, 0.85), "hedge_stack": (0.5, 1.5)},
-    "casual":    {"em_dash": (4, 8),  "era_vocab": (1.5, 3.5), "neg_parallel": (0.8, 2.0),
-                  "tricolon": (1.5, 3.0), "burstiness_cv": (0.50, 0.35), "bullet_share": (0.10, 0.25),
-                  "bold_per_1k": (5, 12), "significance": (0.4, 1.2), "mtld": (50, 40),
-                  "list3_share": (0.55, 0.75), "hedge_stack": (0.5, 1.5)},
+    "general": {
+        "em_dash": (5, 9),
+        "era_vocab": (1.5, 3.0),
+        "neg_parallel": (0.6, 1.5),
+        "tricolon": (1.5, 3.0),
+        "burstiness_cv": (0.45, 0.30),
+        "bullet_share": (0.15, 0.30),
+        "bold_per_1k": (4, 10),
+        "significance": (0.5, 1.5),
+        "mtld": (55, 45),
+        "list3_share": (0.6, 0.8),
+        "hedge_stack": (0.5, 1.5),
+    },
+    "academic": {
+        "em_dash": (6, 11),
+        "era_vocab": (1.5, 3.5),
+        "neg_parallel": (0.5, 1.2),
+        "tricolon": (1.2, 2.5),
+        "burstiness_cv": (0.40, 0.28),
+        "bullet_share": (0.05, 0.15),
+        "bold_per_1k": (2, 6),
+        "significance": (0.8, 2.0),
+        "mtld": (55, 45),
+        "list3_share": (0.6, 0.8),
+        "hedge_stack": (0.8, 2.0),
+    },
+    "technical": {
+        "em_dash": (3, 6),
+        "era_vocab": (1.2, 2.5),
+        "neg_parallel": (0.6, 1.5),
+        "tricolon": (1.0, 2.0),
+        "burstiness_cv": (0.42, 0.30),
+        "bullet_share": (0.45, 0.70),
+        "bold_per_1k": (6, 15),
+        "significance": (0.4, 1.2),
+        "mtld": (50, 40),
+        "list3_share": (0.65, 0.85),
+        "hedge_stack": (0.5, 1.5),
+    },
+    "casual": {
+        "em_dash": (4, 8),
+        "era_vocab": (1.5, 3.5),
+        "neg_parallel": (0.8, 2.0),
+        "tricolon": (1.5, 3.0),
+        "burstiness_cv": (0.50, 0.35),
+        "bullet_share": (0.10, 0.25),
+        "bold_per_1k": (5, 12),
+        "significance": (0.4, 1.2),
+        "mtld": (50, 40),
+        "list3_share": (0.55, 0.75),
+        "hedge_stack": (0.5, 1.5),
+    },
 }
 
 # Family weights: structure 2x, lexical/diagnostic 1x.
-WEIGHTS = {"neg_parallel": 2, "significance": 2, "burstiness": 2, "formatting": 2,
-           "tricolon": 2, "artifacts": 2, "era_vocab": 1, "em_dash": 1, "mtld": 1,
-           "hedge_stack": 1}
+WEIGHTS = {
+    "neg_parallel": 2,
+    "significance": 2,
+    "burstiness": 2,
+    "formatting": 2,
+    "tricolon": 2,
+    "artifacts": 2,
+    "era_vocab": 1,
+    "em_dash": 1,
+    "mtld": 1,
+    "hedge_stack": 1,
+}
 
 
 def strip_code(lines):
@@ -163,7 +245,7 @@ def strip_code(lines):
             run = m.group(1)
             if fence is None:
                 fence = (run[0], len(run))
-            elif run[0] == fence[0] and len(run) >= fence[1] and not ln[len(run):].strip():
+            elif run[0] == fence[0] and len(run) >= fence[1] and not ln[len(run) :].strip():
                 fence = None
             out.append("")
             continue
@@ -216,6 +298,7 @@ def find_hits_paragraphs(lines, patterns, flags=re.IGNORECASE):
 
 def mtld(tokens, threshold=0.72):
     """Measure of Textual Lexical Diversity (McCarthy & Jarvis 2010)."""
+
     def factors(seq):
         count, types, factor_count = 0, set(), 0.0
         for tok in seq:
@@ -230,6 +313,7 @@ def mtld(tokens, threshold=0.72):
             if ttr < 1:
                 factor_count += (1 - ttr) / (1 - threshold)
         return factor_count
+
     if len(tokens) < 50:
         return None
     fwd, bwd = factors(tokens), factors(list(reversed(tokens)))
@@ -262,8 +346,7 @@ def era_vocab_hits(lines):
     hits, weight_sum = [], 0.0
     for j, (pos, w, wt, line) in enumerate(positions):
         near_distinct = any(
-            abs(p2 - pos) <= 100 and w2 != w
-            for k, (p2, w2, _, _) in enumerate(positions) if k != j
+            abs(p2 - pos) <= 100 and w2 != w for k, (p2, w2, _, _) in enumerate(positions) if k != j
         )
         if near_distinct:
             hits.append({"line": line, "match": w})
@@ -299,7 +382,9 @@ def analyze(text, genre):
     n_words = len(tokens)
     sents = sentences_of(prose)
     n_sents = len(sents)
-    per_1k = (lambda n: (n / n_words * 1000) if n_words else 0.0)
+
+    def per_1k(n):
+        return (n / n_words * 1000) if n_words else 0.0
 
     fam = {}
 
@@ -316,7 +401,7 @@ def analyze(text, genre):
     tri_value = per_1k(len(tri_hits))
     # exactly-3-item list share (needs >=4 lists to be meaningful)
     lists, current = [], 0
-    for ln in lines + [""]:
+    for ln in [*lines, ""]:
         if BULLET_LINE.match(ln):
             current += 1
         else:
@@ -338,15 +423,23 @@ def analyze(text, genre):
     fam["burstiness"] = {"value": round(cv, 3) if cv is not None else None, "hits": []}
 
     nonempty = [ln for ln in lines if ln.strip()]
-    bullet_share = (sum(1 for ln in nonempty if BULLET_LINE.match(ln)) / len(nonempty)) if nonempty else 0.0
+    bullet_share = (
+        (sum(1 for ln in nonempty if BULLET_LINE.match(ln)) / len(nonempty)) if nonempty else 0.0
+    )
     bold_hits = find_hits(lines, [BOLD_SPAN])
     fmt_band = max(
         band(bullet_share, *th["bullet_share"]),
         band(per_1k(len(bold_hits)), *th["bold_per_1k"]),
     )
-    fam["formatting"] = {"value": round(bullet_share, 3), "bold_per_1k": round(per_1k(len(bold_hits)), 2), "hits": bold_hits[:10]}
+    fam["formatting"] = {
+        "value": round(bullet_share, 3),
+        "bold_per_1k": round(per_1k(len(bold_hits)), 2),
+        "hits": bold_hits[:10],
+    }
 
-    sig_hits = find_hits_paragraphs(lines, SIGNIFICANCE_PHRASES) + find_hits_paragraphs(lines, [ING_PIVOT])
+    sig_hits = find_hits_paragraphs(lines, SIGNIFICANCE_PHRASES) + find_hits_paragraphs(
+        lines, [ING_PIVOT]
+    )
     fam["significance"] = {"value": round(per_1k(len(sig_hits)), 2), "hits": sig_hits}
 
     hs_hits = find_hits(lines, [HEDGE_STACKS])
@@ -389,14 +482,28 @@ def analyze(text, genre):
         score = min(score, 49.0)
 
     score = round(score)
-    band_name = ("clean" if score < 25 else "mild" if score < 50
-                 else "slop-cluster" if score < 75 else "heavy-slop")
+    band_name = (
+        "clean"
+        if score < 25
+        else "mild"
+        if score < 50
+        else "slop-cluster"
+        if score < 75
+        else "heavy-slop"
+    )
     confident = n_words >= MIN_WORDS and n_sents >= MIN_SENTENCES
 
     return {
-        "schema": SCHEMA, "genre": genre, "words": n_words, "sentences": n_sents,
-        "confidence": "ok" if confident else "low (below %d words / %d sentences)" % (MIN_WORDS, MIN_SENTENCES),
-        "score": score, "band": band_name, "active_families": active,
+        "schema": SCHEMA,
+        "genre": genre,
+        "words": n_words,
+        "sentences": n_sents,
+        "confidence": "ok"
+        if confident
+        else f"low (below {MIN_WORDS} words / {MIN_SENTENCES} sentences)",
+        "score": score,
+        "band": band_name,
+        "active_families": active,
         "families": fam,
         "notes": [
             "Score reflects clusters of co-occurring tells, never a single metric.",
@@ -407,17 +514,19 @@ def analyze(text, genre):
 
 
 def human_report(res, name):
-    out = ["%s: score %d/100 (%s, genre=%s, confidence=%s)" %
-           (name, res["score"], res["band"], res["genre"], res["confidence"]),
-           "  words=%d sentences=%d active_families=%s" %
-           (res["words"], res["sentences"], ",".join(res["active_families"]) or "none")]
+    out = [
+        f"{name}: score {res['score']}/100 "
+        f"({res['band']}, genre={res['genre']}, confidence={res['confidence']})",
+        f"  words={res['words']} sentences={res['sentences']} "
+        f"active_families={','.join(res['active_families']) or 'none'}",
+    ]
     for fname, info in res["families"].items():
         flag = "  <-- " + ("STRONG" if info["band"] >= 1 else "warn") if info["band"] >= 0.5 else ""
-        out.append("  %-13s value=%-8s band=%.2f%s" % (fname, info["value"], info["band"], flag))
+        out.append(f"  {fname:<13} value={info['value']!s:<8} band={info['band']:.2f}{flag}")
         for h in info["hits"][:5]:
-            out.append("      L%-5d %s" % (h["line"], h["match"]))
+            out.append(f"      L{h['line']:<5} {h['match']}")
         if len(info["hits"]) > 5:
-            out.append("      ... %d more hits" % (len(info["hits"]) - 5))
+            out.append(f"      ... {len(info['hits']) - 5} more hits")
     out.extend("  note: " + n for n in res["notes"])
     return "\n".join(out)
 
@@ -467,30 +576,64 @@ def selftest():
         ("human sample scores < 25", human["score"] < 25),
         ("human sample never flags on cluster gate", len(human["active_families"]) <= 1),
         ("tricolon regex fires", bool(TRICOLON.search("fast, cheap, and reliable"))),
-        ("neg-parallel regex fires", any(rx.search("It's not just a tool, it's a journey") for rx in NEG_PARALLEL)),
-        ("neg-parallel matches across a line wrap",
-         bool(find_hits_paragraphs(["It's not just a tool,", "it's a journey for everyone."], NEG_PARALLEL))),
-        ("artifact regex fires", bool(re.search(ARTIFACTS[0], "as an AI language model", re.IGNORECASE))),
-        ("recap scaffold fires", bool(find_hits_paragraphs(["In conclusion, the results were mixed."], SIGNIFICANCE_PHRASES))),
-        ("abbreviations don't split sentences",
-         len(sentences_of("We saw Dr. Smith at the lab. He waved at us.")) == 2),
-        ("nested fences stay stripped",
-         analyze("````text\nprose -- with dashes\n```sh\nrm --rf\n```\nmore -- here\n````\n" + SELFTEST_HUMAN, "general")["families"]["em_dash"]["value"] == 0.0),
+        (
+            "neg-parallel regex fires",
+            any(rx.search("It's not just a tool, it's a journey") for rx in NEG_PARALLEL),
+        ),
+        (
+            "neg-parallel matches across a line wrap",
+            bool(
+                find_hits_paragraphs(
+                    ["It's not just a tool,", "it's a journey for everyone."], NEG_PARALLEL
+                )
+            ),
+        ),
+        (
+            "artifact regex fires",
+            bool(re.search(ARTIFACTS[0], "as an AI language model", re.IGNORECASE)),
+        ),
+        (
+            "recap scaffold fires",
+            bool(
+                find_hits_paragraphs(
+                    ["In conclusion, the results were mixed."], SIGNIFICANCE_PHRASES
+                )
+            ),
+        ),
+        (
+            "abbreviations don't split sentences",
+            len(sentences_of("We saw Dr. Smith at the lab. He waved at us.")) == 2,
+        ),
+        (
+            "nested fences stay stripped",
+            analyze(
+                "````text\nprose -- with dashes\n```sh\nrm --rf\n```\nmore -- here\n````\n"
+                + SELFTEST_HUMAN,
+                "general",
+            )["families"]["em_dash"]["value"]
+            == 0.0,
+        ),
     ]
     failed = [name for name, ok in checks if not ok]
     for name, ok in checks:
         print(("PASS " if ok else "FAIL ") + name)
-    print("slop=%d (%s) human=%d (%s)" % (slop["score"], slop["band"], human["score"], human["band"]))
+    print(f"slop={slop['score']} ({slop['band']}) human={human['score']} ({human['band']})")
     return 1 if failed else 0
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Deterministic AI-tell cluster scorer (0-100). Detect only; never rewrites.")
+    ap = argparse.ArgumentParser(
+        description="Deterministic AI-tell cluster scorer (0-100). Detect only; never rewrites."
+    )
     ap.add_argument("paths", nargs="*", help="text/markdown files ('-' or empty = stdin)")
     ap.add_argument("--genre", choices=sorted(THRESHOLDS), default="general")
     ap.add_argument("--json", action="store_true", help="emit machine-readable JSON report")
-    ap.add_argument("--fail-above", choices=["mild", "slop-cluster", "heavy-slop"], default=None,
-                    help="exit 2 if any confident score reaches this band (CI gate)")
+    ap.add_argument(
+        "--fail-above",
+        choices=["mild", "slop-cluster", "heavy-slop"],
+        default=None,
+        help="exit 2 if any confident score reaches this band (CI gate)",
+    )
     ap.add_argument("--self-test", action="store_true", help="run built-in fixtures and exit")
     args = ap.parse_args(argv)
 
@@ -504,12 +647,12 @@ def main(argv=None):
         for p in args.paths:
             path = Path(p)
             if not path.is_file():
-                print("ERROR: not a file: %s" % p, file=sys.stderr)
+                print(f"ERROR: not a file: {p}", file=sys.stderr)
                 return 1
             try:
                 inputs.append((p, path.read_text(encoding="utf-8")))
             except (OSError, UnicodeDecodeError) as exc:
-                print("ERROR: cannot read %s: %s" % (p, exc), file=sys.stderr)
+                print(f"ERROR: cannot read {p}: {exc}", file=sys.stderr)
                 return 1
 
     band_rank = {"clean": 0, "mild": 1, "slop-cluster": 2, "heavy-slop": 3}
@@ -518,8 +661,11 @@ def main(argv=None):
         res = analyze(text, args.genre)
         res["file"] = name
         results.append(res)
-        if (args.fail_above and res["confidence"] == "ok"
-                and band_rank[res["band"]] >= band_rank[args.fail_above]):
+        if (
+            args.fail_above
+            and res["confidence"] == "ok"
+            and band_rank[res["band"]] >= band_rank[args.fail_above]
+        ):
             tripped = True
 
     if args.json:

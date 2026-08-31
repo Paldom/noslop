@@ -1,6 +1,6 @@
 ---
 name: deslop
-description: Rewrites copy to strip AI-writing tells while preserving meaning and voice - bounded edits on flagged spans only, protected quotes/code/numbers, dialect-safe, with a deterministic post-check. Use when the user asks to deslop, de-AI, strip AI slop or AI tells, or make a draft read human. Not for scoring-only requests, judging an existing edit pair, grammar or tone fixes, or authorship detection.
+description: Rewrites copy to strip AI-writing tells - negative parallelism (it's not X, it's Y), stacked hedging, inflated significance - preserving meaning and voice through bounded edits on flagged spans, protected quotes/code/numbers and a deterministic post-check. Use to deslop, de-AI, cut hedging, or make a draft read human. Not for scoring only, judging an edit pair, or grammar fixes.
 ---
 
 # deslop

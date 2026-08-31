@@ -7,6 +7,20 @@ versioning: [SemVer](https://semver.org) on the plugin manifest
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-31
+
+### Added
+- Adopted the current skillskit gate: executed trigger evals scoring every trigger
+  prompt against every skill description (rank-1 routing accuracy 78.9%), a security
+  scan over skill content and bundled scripts, ruff lint and format, README-shape
+  validation, pre-commit hooks and a write-time lint hook.
+
+### Fixed
+- Findings the new lint gate surfaced in this repo's own scripts, fixed at the source;
+  where a rule was wrong for a line it is suppressed there with its reason, never by
+  dropping the rule.
+
+
 Nothing yet.
 
 ## [0.1.0] - 2026-07-21
