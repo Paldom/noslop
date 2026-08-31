@@ -1,7 +1,11 @@
 ---
 name: add-skill
-description: Authors or improves an Agent Skill in this repo via the eval-first workflow - scope one purpose, write trigger evals, draft SKILL.md, validate, iterate. Use when the user asks to create, add, write, refine, or fix a skill ("add a skill for X", "improve triggering of Y"). Not for scaffolding a new repository or editing infrastructure (hooks, CI, the validator/scripts, docs).
+description: Authors or improves one Agent Skill via the eval-first workflow - scope a single purpose, write trigger evals, draft SKILL.md, validate, iterate. Use when the user asks to create, add, write, refine, or fix a skill ("add a skill for X", "improve triggering of Y"). Not for infrastructure work - hooks, CI, the validator, or docs.
 argument-hint: <skill-name or idea>
+# Side-effecting maintainer tool that writes a whole skill folder, invoked as
+# /add-skill - exactly like its sibling publish-repo. Nothing routes it, so its
+# trigger evals are waived (docs/evals.md).
+disable-model-invocation: true
 metadata:
   internal: true
 ---
